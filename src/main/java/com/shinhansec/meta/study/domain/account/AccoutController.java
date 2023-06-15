@@ -5,8 +5,12 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.annotation.Nullable;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Size;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -15,11 +19,17 @@ import java.util.ArrayList;
 @RestController
 @Slf4j
 @RequestMapping("/account")
+@Validated
 public class AccoutController {
 
-    @Autowired
     AccountService accountService;
-    @Operation(summary = "계좌조회", description = "계좌목록을 조회함.", tags = { "Account Controller" })
+
+    @Autowired
+    public void setAccountService(AccountService accountService){
+        this.accountService = accountService;
+    }
+
+    @Operation(summary = "계좌조회", description = "계좌목록을 조회함. ", tags = { "Account Controller" })
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK",
                     content = @Content(schema = @Schema(implementation = Account.class))),
@@ -43,12 +53,12 @@ public class AccoutController {
     }
 
     @PostMapping
-    public Account save(@RequestBody Account account) {
+    public Account save(@RequestBody @Valid Account account) {
         return accountService.save(account);
     }
 
     @PutMapping
-    public Account update(@RequestParam Integer id,@RequestParam String accountNo,@RequestParam String name,@RequestParam String password) {
+    public Account update(@RequestParam Integer id, @RequestParam String accountNo, @RequestParam @Valid @Size(min=3, max=3) String name, @RequestParam  @Nullable String password) {
         return accountService.update(id, accountNo, name, password);
     }
 
